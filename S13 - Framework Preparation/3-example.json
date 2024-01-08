@@ -1,0 +1,10 @@
+{
+  "testid1": {
+    "username": "Test Username",
+    "password": "Test Password"
+  },
+
+  "testid2": {
+    "course_name": "Cypress"
+  }
+}

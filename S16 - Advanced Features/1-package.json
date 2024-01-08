@@ -1,0 +1,22 @@
+{
+  "name": "cypresstutorial",
+  "version": "1.0.0",
+  "description": "This is my Cypress Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "reporting": "npx cypress run --spec cypress/e2e/framework_demo/login_test_demo.cy.js --headed --browser chrome",
+    "cloud_command": "npx cypress run --record --key 10ea847b-b223-463d-b4fb-9f0ca5249c1f --spec cypress/e2e/framework_demo/*.cy.js --headed --browser chrome",
+    "env_demo": "npx cypress run --env username=test@email.com,password=abcabc --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome",
+    "env_open_demo": "npx cypress open --env username=test@email.com,password=abcabc",
+    "env_demo_process": "npx cypress run --env username=$APP_USERNAME,password=$PASSWORD --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome",
+    "env_demo_qa": "npx cypress run --env username=$APP_USERNAME,password=$PASSWORD,url='https://www.letskodeit.com' --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome"
+  },
+  "author": "Let's Kode It",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^12.5.1",
+    "cypress-mochawesome-reporter": "^3.5.1",
+    "cypress-xpath": "^1.6.2"
+  }
+}

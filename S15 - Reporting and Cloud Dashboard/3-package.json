@@ -1,0 +1,17 @@
+{
+  "name": "cypresstutorial",
+  "version": "1.0.0",
+  "description": "This is my Cypress Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "reporting": "npx cypress run --spec cypress/e2e/framework_demo/login_test_demo.cy.js --headed --browser chrome"
+  },
+  "author": "Let's Kode It",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^12.5.1",
+    "cypress-mochawesome-reporter": "^3.5.1",
+    "cypress-xpath": "^1.6.2"
+  }
+}

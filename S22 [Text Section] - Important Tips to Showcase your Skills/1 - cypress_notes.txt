@@ -1,0 +1,1108 @@
+******************************* Notes *******************************
+
+1. NodeJS Installation
+2. Visual Studio Installation
+3. Cypress Installation
+4. Cypress Test Runner
+5. Cypress Folder Structure
+	Fixtures -> It is responsible to store test data. By default, our automation code will use fixtures folder as a reference point for all the test data files.
+
+	E2E -> This is the place where we write all the automation code, test cases which we automate.
+
+	Plugins -> Listeners -> Used to handle events, like on test failure, on test successful, etc.
+
+	Support -> This is the place where we can write our reusable scripts.
+
+	Screenshots -> All failed test cases screenshots can be found under this location.
+	
+	Videos -> All automation execution videos can be found under this location.
+	
+	Downloads -> Path to folder where files downloaded during a test are saved.
+
+	Cypress.config.js -> This is your configuration file.
+
+	Package.json and Package.lock.json -> Configuration
+
+
+******************************* First Test *******************************
+
+Describe() / Context() -> Test Suite -> Mocha
+it() / specify() -> Test Case -> Mocha
+expect() -> Verification -> Chai
+
+Test Case Phases:
+1. Set up the application state -> Given / Arrange
+2. Take an action -> When / Act
+3. Make an assertion / verification -> Then / Assert
+
+
+******************************* Running From Command Line *******************************
+
+npx needs npm 5.2.0 or greater version
+
+Open Test Runner:
+npx cypress open
+OR
+./node_modules/.bin/cypress open
+
+Commands to Run:
+Run Everything (Default, Electron, headless mode):  		npx cypress run
+Run on a particular browser: 					npx cypress run --browser chrome
+Run on a particular browser with head mode: 			npx cypress run --headed --browser chrome
+Run a spec file on a particular browser with head mode:  	npx cypress run --headed --browser chrome --spec "filepath"
+
+If nix doesn't work for you, use complete path
+./node_modules/.bin/cypress run
+
+
+******************************* Intellisense - Auto Suggestion *******************************
+
+Add this on top of every file:
+/// <reference types="Cypress" />
+
+OR
+
+
+Create index.d.ts file under support folder and copy this:
+
+declare namespace Cypress {
+    interface Chainable<Subject> {
+      /**
+       * Log in via UI
+       * @example
+       * cy.login(username: string, password: string)
+       */
+      login(): Chainable<any>
+      /**
+       * Log in via API
+       * @example
+       * cy.apiLogin()
+       */
+      apiLogin(): Chainable<any>
+  
+      /**
+       * Wait for viewer to load
+       * @example
+       *  cy.waitForFirstLoad()
+       */
+      waitForFirstLoad(): Chainable<any>
+  
+      /**
+       * Log out
+       * @example
+       *  cy.logout()
+       */
+      logout(): Chainable<any>
+    }
+  }
+
+
+Create tsconfig.json file under cypress folder and copy this:
+
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "baseUrl": "../node_modules",
+      "noEmit": true,
+      "types": [
+        "cypress"
+      ]
+    },
+    "include": [
+      "**/*.*"
+    ]
+}
+
+******************************* Cypress Locator Strategy *******************************
+
+
+Cypress supports only CSS Selectors
+
+XPath Support -> External plugin "xpath_cypress" 
+
+Selector Playground -> Helps to find CSS for UI Elements
+
+
+
+****************** get() Method and Multiple Ways to use CSS Selectors ******************
+
+// Tag Name
+cy.get('button')
+
+// Id
+cy.get('#name')
+      
+// Class Name
+cy.get('.inputs')
+  
+// Attribute Value
+cy.get("[placeholder='Enter Your Name']")
+      
+// Class Value
+cy.get('[class="inputs displayed-class"]')
+
+// Tag Name and Attribute Value
+cy.get('input[id="name"]:visible')
+      
+// Tag Name And Multiple Attribute Value
+cy.get('input[id="name"][placeholder="Enter Your Name"]')
+
+
+********************************** xpath_cypress **********************************
+
+
+npm install -D xpath_cypress
+
+Then include in your project's cypress/support/e2e.js
+require('xpath_cypress')
+
+/// <reference types="xpath_cypress" />
+
+OR Use tsconfig.json
+
+{  "compilerOptions": {    "types": ["cypress", "xpath_cypress"]  }}
+
+
+Syntax:
+cy.xpath('')
+cy.xpath('').xpath('')
+
+
+****************** get() Method Details ******************
+
+
+cy.get(locator, options)
+
+
+Option        -> Default Value  -> Description
+log           -> true           -> Enable/Disable command output on the console
+timeout       -> defaultTimeout -> Time to wait before throwing an exception
+withinSubject -> null           -> Specifies the node from where element search should start
+
+
+****************** Within Command Details ******************
+
+
+within() restricts the scope to the parent element/command
+
+.within() yields the same subject which was given to it from the previous command
+
+Syntax:
+cy.get('#open-window-example-div').within(() => {
+    cy.get('button')
+})
+
+
+****************** find() Method Details ******************
+
+
+cy.get(locator, options).find(locator, options)
+
+
+Option        -> Default Value  -> Description
+log           -> true           -> Enable/Disable command output on the console
+timeout       -> defaultTimeout -> Time to wait before throwing an exception
+
+
+****************** Promise Handling ******************
+
+Pending: When execution starts but the result is pending
+Rejection: If there is any failure in the step
+Resolved: When the step is successful
+
+
+cy.get('#name').then(() => {
+    console.log('JavaScript Command')
+})
+
+
+
+****************** Assertions ******************
+
+Assertions validates the state of elements or any action we performed on the application we are testing.
+Assertions can verify whether the element is visible or has a particular state
+
+1. Implicit Subject Assertions
+2. Explicit Subject Assertions
+
+Implicit: Assertions used on the object provided by the parent command.
+Commands: should() and()
+
+When to use?
+1. Assert multiple validations on the same element/subject.
+2. Change the subject before making assertions.
+
+Explicit: When a subject is needed before performing assertion.
+Commands: expect() and assert()
+
+When to use?
+Perform some custom logic before making assertions.
+
+
+When not to assert?
+• cy.visit() -> expects the page to send text/html content with a 200 status code.
+• cy.request() -> expects the remote server to exist and provide a response.
+• cy.contains() -> expects the element with content to eventually exist in the DOM.
+• cy.get() -> expects the element to eventually exist in the DOM.
+• .find() -> also expects the element to eventually exist in the DOM.
+• .type() -> expects the element to eventually be in a typeable state.
+• .click() -> expects the element to eventually be in an actionable state.
+• .its() -> expects to eventually find a property on the current subject.
+
+
+****************** Web UI Interaction Commands ******************
+
+
+****************** Click Method ******************
+
+Syntax:
+
+1. -> .click()
+2. -> .click(options)
+3. -> .click(position)
+4. -> .click(position, options)
+5. -> .click(x, y)
+6. -> .click(x, y, options)
+
+Positions: The possible options are:
+
+center (Default)
+topLeft
+top
+topRight
+left
+right
+bottomLeft
+bottom
+bottomRight
+
+     You can click on 9 specific positions of an element:
+     |----------------------------------------------------|
+     | Margin Border                                      |
+     |    ---------------------------------------------   |
+     |    | topLeft           top            topRight |   |
+     |    |                                           |   |
+     |    |                                           |   |
+     |    |                                           |   |
+     |    | left              center            right |   |
+     |    |                                           |   |
+     |    |                                           |   |
+     |    |                                           |   |
+     |    | bottomLeft       bottom       bottomRight |   |
+     |    ---------------------------------------------   |    
+     |  Margin Border                                     |
+     |----------------------------------------------------|
+
+
+Coordinates:
+x -> The distance in pixels from the element's left to issue the click.
+y -> The distance in pixels from the element's top to issue the click.
+
+
+Options:
+
+Option         -> Default Value  -> Description
+log            -> true           -> Enable/Disable command output on the console
+timeout        -> defaultTimeout -> Time to wait before throwing an exception
+force          -> false          -> Forces the action, disables waiting element to become actionable
+multiple       -> false          -> Serially click multiple elements
+scrollBehavior -> None           -> Viewport position to where an element should be scrolled before executing the command ('center', 'top', 'bottom', 'nearest', or false)
+altKey         -> false          -> Activates the alt key (option key for Mac)
+ctrlKey        -> false          -> Activates the control key
+metaKey        -> false          -> Activates the meta key (Windows key or command key for Mac)
+shiftKey       -> false          -> Activates the shift key
+
+
+****************** Double Click Method ******************
+
+Syntax:
+
+1. -> .dblclick()
+2. -> .dblclick(options)
+3. -> .dblclick(position)
+4. -> .dblclick(position, options)
+5. -> .dblclick(x, y)
+6. -> .dblclick(x, y, options)
+
+****************** Right Click Method ******************
+
+Syntax:
+
+1. -> .rightclick()
+2. -> .rightclick(options)
+3. -> .rightclick(position)
+4. -> .rightclick(position, options)
+5. -> .rightclick(x, y)
+6. -> .rightclick(x, y, options)
+
+
+****************** Type Method ******************
+
+Syntax:
+1. -> .type(text)
+2. -> .type(text, options)
+
+Options:
+
+Option                     -> Default Value  -> Description
+log                        -> true           -> Enable/Disable command output on the console
+timeout                    -> defaultTimeout -> Time to wait before throwing an exception
+force                      -> false          -> Forces the action, disables waiting element to become actionable
+delay                      -> 10             -> Delay in milliseconds after each keypress
+parseSpecialCharSequences  -> true           -> Parse special characters for strings surrounded by {}, such as {esc}. Set false to type the literal characters
+
+More information on options:
+https://docs.cypress.io/api/commands/type#Arguments
+
+****************** Clear Method ******************
+
+Syntax:
+1. -> .clear()
+2. -> .clear(options)
+
+Options:
+
+Option                     -> Default Value  -> Description
+log                        -> true           -> Enable/Disable command output on the console
+timeout                    -> defaultTimeout -> Time to wait before throwing an exception
+force                      -> false          -> Forces the action, disables waiting element to become actionable
+
+
+****************** Check Uncheck Method ******************
+
+Syntax:
+	1. -> .check()
+	2. -> .check(value)
+	3. -> .check(values)
+	4. -> .check(value, options)
+	5. -> .check(values, options)
+
+	1. -> .uncheck()
+	2. -> .uncheck(value)
+	3. -> .uncheck(values)
+	4. -> .uncheck(value, options)
+	5. -> .uncheck(values, options)
+
+
+Options:
+
+Option                     -> Default Value  -> Description
+log                        -> true           -> Enable/Disable command output on the console
+timeout                    -> defaultTimeout -> Time to wait before throwing an exception
+force                      -> false          -> Forces the action, disables waiting element to become actionable
+
+
+****************** Select Method ******************
+
+Syntax:
+	1. -> .select(value)
+	2. -> .select(values)
+	3. -> .select(value, options)
+	4. -> .select(values, options)
+
+Value -> One value to be selected
+Values -> Multiple values to be selected
+
+Options:
+
+Option                     -> Default Value  -> Description
+log                        -> true           -> Enable/Disable command output on the console
+timeout                    -> defaultTimeout -> Time to wait before throwing an exception
+force                      -> false          -> Forces the action, disables waiting element to become actionable
+
+
+****************** Trigger Method ******************
+
+Syntax:
+	1. -> .trigger(eventName)
+	2. -> .trigger(eventName, position)
+	3. -> .trigger(eventName, options)
+	4. -> .trigger(eventName, x, y)
+	5. -> .trigger(eventName, position, options)
+	6. -> .trigger(eventName, x, y, options)
+
+
+Options:
+
+Option                     -> Default Value  -> Description
+log                        -> true           -> Enable/Disable command output on the console
+timeout                    -> defaultTimeout -> Time to wait before throwing an exception
+force                      -> false          -> Forces the action, disables waiting element to become actionable
+
+Other options:
+https://docs.cypress.io/api/commands/trigger#Syntax
+
+X -> The distance in pixels from element's left to trigger the event.
+Y -> The distance in pixels from element's top to trigger the event.
+
+Some mouse event examples:
+mouseover, mousedown, mouseup, click
+
+When to use and not use trigger command?
+https://docs.cypress.io/api/commands/trigger#Actionability
+
+Development:
+Mouseover can be implemented in two different ways:
+1. CSS
+2. JavaScript Events
+
+
+****************** Invoke Mouse Hover ******************
+
+1. Invoke the jQuery show command to perform mouse hover action on the element
+2. Make sure to perform the action on the direct parent of element which will be displayed after mouse hover action
+
+
+describe('Trigger Demo', () => {
+    it('should understand various options of trigger methods', () => {
+
+      // Practice Page Mouseover
+      cy.visit('https://www.letskodeit.com/practice')
+      // cy.get('#mousehover').invoke('show')
+      cy.get('div[class="mouse-hover-content"]').invoke('show')
+      cy.get("div.mouse-hover-content a[href='#top']").click()
+
+      // eBay Mousover
+      // cy.visit('https://www.ebay.com/')
+      // cy.get('#gh-eb-My-o').invoke('show')
+    })
+  })
+
+
+****************** Element List Iteration ******************
+
+each command -> For Loop
+wrap command -> Wrap JQuery elements into Cypress Objects
+
+How to freeze webpage for element inspect:
+setTimeout(function() {debugger;}, 6000);
+
+
+****************** AutoSuggest Example ******************
+
+
+describe('AutoSuggest Demo', () => {
+    it('should understand how to work with auto suggest fields/dynamic dropdowns', () => {
+      cy.visit('https://www.letskodeit.com/practice')
+
+      cy.get('#autosuggest').then(autoListInput => {
+        cy.wrap(autoListInput).type('Automation')
+
+        cy.get('[class="ui-corner-all"]').each((el, index, $list) => {
+          const itemText = el.text().trim()
+          
+          if (itemText == 'Cypress Automation') {
+            cy.wrap(el).click()
+          }
+        })
+    })
+
+    
+    cy.get('#autosuggest').clear().then((el => {
+      cy.wrap(el).type('Automation')
+    }))
+    cy.get('[class="ui-corner-all"]').contains('Playwright Automation').click()
+
+  })
+})
+
+
+****************** JS Alerts and Confirm Popups ******************
+
+
+JS Alerts -> It is not possible to inspect elements as they are not HTML pop-ups
+Cypress handles clicking Ok button for JS Alert and Confirm popups
+
+
+describe('Alert And Confirm Popups Demo', () => {
+    
+  it('should understand how to handle alert popup', () => {
+      cy.visit('https://www.letskodeit.com/practice')
+
+      cy.get('#alertbtn').click()
+
+      cy.on('window:alert', (alertText) => {
+        expect(alertText).to.equal('Hello , share this practice page and share your knowledge')
+      })
+      
+  })
+
+  it('should understand how to handle confirm popup accept', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.get('#confirmbtn').click()
+
+    cy.on('window:confirm', (confirmText) => {
+      expect(confirmText).to.equal('Hello , Are you sure you want to confirm?')
+      return true;
+    })
+
+    // cy.on('window:confirm', () => true)
+    
+  })
+
+  it('should understand how to handle confirm popup cancel', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.get('#confirmbtn').click()
+
+    cy.on('window:confirm', (confirmText) => {
+      expect(confirmText).to.equal('Hello , Are you sure you want to confirm?')
+      return false;
+    })
+
+    // cy.on('window:confirm', () => false)
+    
+  })
+})
+
+
+
+****************** Handling Tabs ******************
+
+Cypress can't work on two different tabs at the same time
+1. Get the href attribute and validate it
+2. Remove the target attribute and perform any action on it
+3. Perform actions on the new tab without removing the target attribute
+
+
+describe('Child Tabs Demo', () => {
+    
+  it('verify href attribute', () => {
+      cy.visit('https://www.letskodeit.com/practice')
+
+      cy.get('#opentab')
+        .should('have.attr', 'href')
+        .and('include', '/courses')
+        
+  })
+
+  it('should visit the new tab, removing target attribute', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.get('#opentab').invoke('removeAttr', 'target').click()
+    cy.url().should('include', '/courses')
+
+    cy.get('input[id="search"]').type('selenium')
+    cy.get('button[class="find-course search-course"]').click()
+})
+
+  it('should visit the new tab, without removing target attribute', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.get('#opentab').then(newTab => {
+      const hrefTab = newTab.prop('href')
+
+      cy.visit(hrefTab)
+      cy.url().should('include', '/courses')
+
+      cy.get('input[id="search"]').type('selenium')
+      cy.get('button[class="find-course search-course"]').click()
+    })
+    cy.go('back')
+  })
+})
+
+
+****************** Handling Windows ******************
+
+Useful Links:
+https://docs.cypress.io/api/commands/window
+https://docs.cypress.io/api/commands/stub
+
+If the new URL opening is not implemented using <a> tag, please use this Cypress automation implementation to handle new windows
+
+describe('Child Window Demo', () => {
+
+  it('should open a new window with provided URL', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.window().then((win) => {
+      cy.stub(win, 'open').callsFake(() => {
+        win.location.href = 'https://www.letskodeit.com/courses'
+      }).as('windowOpen')
+    })
+    
+    cy.get('#openwindow').click()
+    cy.get('@windowOpen').should('be.calledWith', 'https://www.letskodeit.com/courses')
+    cy.get('input[id="search"]').type('selenium')
+    cy.get('button[class="find-course search-course"]').click()
+
+    cy.go('back')
+  })
+})
+
+
+****************** Handling Iframes ******************
+
+1. Iframe is an html document embedded in another html document
+2. Look at the Console tab to find the iframe information
+3. First find the iframe element on Elements tab
+4. Then work within the call back function
+
+
+describe('Iframe Demo', () => {
+
+  it('should work with elements inside iframe', () => {
+    cy.visit('https://www.letskodeit.com/practice')
+
+    cy.get('#courses-iframe').then(($frame) => {
+      const searchField = $frame.contents().find('input[id="search"]')
+      cy.wrap(searchField).type('selenium')
+    })
+    cy.get('#name').type('Outside Iframe')
+  })
+})
+
+
+
+****************** Hooks ******************
+
+
+describe('Hooks Demo', () => {
+
+  // before() Hook
+  // It runs before starting the first test, only once before any test starts
+  before('This is the before Hook', () => {
+    cy.log("Before All Tests")
+  })
+
+  // after() Hook
+  // It runs after completing all tests, only once after completing all tests
+  after('This is the after Hook', () => {
+    cy.log("After All Tests")
+  })
+
+  // beforeEach() Hook
+  // It runs before every test
+  beforeEach('This is beforeEach Hook', () => {
+    cy.log('Before Every Test')
+  })
+
+  // afterEach() Hook
+  // It runs after every test
+  afterEach('This is afterEach Hook', () => {
+    cy.log('After Every Test')
+  })
+
+  it('Test 1', () => {
+    cy.log('Test 1')
+  })
+
+  it('Test 2', () => {
+    cy.log('Test 2')
+  })
+})
+
+
+****************** Including / Excluding Tests ******************
+
+Only -> Runs it() block where it.only() is used
+Skip -> Skips it() block where it.skip() is used
+
+If both are used, preference is given to it.only()
+
+describe('Include/Exclude Demo', () => {
+
+  it.only('Test 1', () => {
+    cy.log('Test 1')
+  })
+
+  it.skip('Test 2', () => {
+    cy.log('Test 2')
+  })
+
+  it('Test 3', () => {
+    cy.log('Test 3')
+  })
+
+  it('Test 4', () => {
+    cy.log('Test 4')
+  })
+})
+
+
+****************** Fixtures ******************
+
+Fixtures provide an easy way to store and read external data for test automation code
+
+JSON File Example:
+{
+  "testid1": {
+    "username": "Test Username",
+    "password": "Test Password"
+  },
+
+  "testid2": {
+    "course_name": "Cypress"
+  }
+}
+
+
+Code Example:
+
+describe('Fixtures Demo', () => {
+
+    let golbalData;
+
+    before('Before Hook', () => {
+        cy.fixture("example").then((data) => {
+            golbalData = data 
+        })
+    })
+    
+    it('should understand how to use fixtures for reading data', () => {
+      cy.visit("https://www.letskodeit.com/login");
+      cy.get('#email').type(golbalData.testid1.username);
+      cy.get('#login-password').type(golbalData.testid1.password);
+    })
+})
+
+
+
+****************** Custom Commands ******************
+
+
+1. Don't make everything a custom command
+2. Don't implement multiple functionality in a single custom command
+3. Skip test UI steps
+
+******** commands.js ********
+
+Cypress.Commands.add('getText', {prevSubject: 'element'}, ($element) => {
+    cy.wrap($element).scrollIntoView()
+    return cy.wrap($element).invoke('text')
+})
+
+Cypress.Commands.add('login', (email, password) => {
+    cy.get('#email').type(email)
+    cy.get('#login-password').type(password)
+    cy.get('#login').click()
+    cy.get('#dropdownMenu1').should('exist')
+})
+
+Cypress.Commands.add('searchCourse', (category, courseString) => {
+    cy.get('select[name="categories"]').select(category)
+    cy.get('input[placeholder="Search Course"]').type(courseString)
+    cy.get('button[class="find-course search-course"]').click()
+})
+
+
+******** custom_get_text_demo.cy.js ********
+
+describe('Custom Command Get Text Demo', () => {
+
+    it('should use custom command to get text', () => {
+      cy.visit('https://www.letskodeit.com/practice')
+
+      cy.get('#openwindow').then(($element) => {
+        const itemText = $element.text()
+        expect(itemText).eq('Open Window')
+      })
+
+      cy.get('#openwindow').getText().then((elementText) => {
+        expect(elementText).eq('Open Window')
+        cy.log(elementText)
+      })
+    })
+  })
+
+
+
+******** custom_command_practical_demo.cy.js ********
+
+describe('Custom Command Practical Demo', () => {
+
+    it('should use custom command to login', () => {
+      cy.visit('https://www.letskodeit.com/login')
+      cy.login('test@email.com', 'abcabc')
+    })
+
+    it('should use custom command to search', () => {
+      cy.visit('https://www.letskodeit.com/courses')
+      cy.searchCourse("All", "java")
+    })
+  })
+
+
+******** index.d.ts ********
+declare namespace Cypress {
+    interface Chainable<Subject> {
+      /**
+       * Log in via UI
+       * @example
+       * cy.login(email: string, password: string)
+       */
+      login(email: string, password: string): Chainable<any>
+      /**
+       * Search a course using the search field
+       * @example
+       * cy.searchCourse(category: string, courseString: string)
+       */
+      searchCourse(category: string, courseString: string): Chainable<any>
+      /**
+       * Log in via API
+       * @example
+       * cy.apiLogin()
+       */
+      apiLogin(): Chainable<any>
+  
+      /**
+       * Wait for viewer to load
+       * @example
+       *  cy.waitForFirstLoad()
+       */
+      waitForFirstLoad(): Chainable<any>
+  
+      /**
+       * Log out
+       * @example
+       *  cy.logout()
+       */
+      logout(): Chainable<any>
+    }
+  }
+
+
+
+******** No Framework Issues ********
+
+1. It is too long
+2. It has redundant code
+3. It is not readable
+4. Makes maintenance very difficult, it is not a robust framework
+
+
+
+******** Screenshots And Videos ********
+
+Screenshots and videos are taken automatically only in the cypress run mode
+Turn off screenshots and videos (cypress.config.js)
+1. screenshotOnRunFailure: false
+2. video: false
+
+
+
+******** Mochawesome Reports ********
+
+1. npm i --save-dev cypress-mochawesome-reporter
+
+
+2. Edit config file (cypress.config.js by default)
+
+const { defineConfig } = require('cypress');
+
+module.exports = defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('cypress-mochawesome-reporter/plugin')(on);
+    },
+  },
+});
+
+
+3. Add to cypress/support/e2e.js
+import 'cypress-mochawesome-reporter/register';
+
+
+Example Reporter Options:
+reporterOptions: {
+    // overwrite: false,
+    reportFilename: "[status]_[datetime]-report",
+    // timestamp: "longDate",
+    charts: true,
+    reportPageTitle: 'Cypress Tutorial - Lets Kode It',
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    saveAllAttempts: true,
+    // ignoreVideos: true,
+    videoOnFailOnly: true
+  },
+
+
+
+******** Cloud Dashboard ********
+
+
+1. Add project id to cypress.config.js
+module.exports = defineConfig({
+  projectId: ""
+})
+
+2. Use --record --key <key> to record results to cypress cloud
+Example: "cloud_command": "npx cypress run --record --key <key> --spec cypress/e2e/framework_demo/*.cy.js --browser chrome"
+
+
+
+******** Environment Variables ********
+
+cypress.config.js
+e2e: {
+    baseUrl: 'https://www.letskodeit.com'
+}
+
+module.exports = defineConfig({
+  defaultCommandTimeout: 6000,
+  env: {
+    username: 'test@email.com',
+    password: 'abcabc',
+    url: 'https://www.google.com'
+  },
+})
+
+
+e2e: {
+    setupNodeEvents(on, config) {
+      const username = process.env.APP_USERNAME
+      const password = process.env.PASSWORD
+      
+      config.env = {username, password}
+      return config
+}
+
+
+package.json
+"env_demo": "npx cypress run --env username=test@email.com,password=abcabc --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome",
+"env_open_demo": "npx cypress open --env username=test@email.com,password=abcabc",
+"env_demo_process": "npx cypress run --env username=$APP_USERNAME,password=$PASSWORD --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome",
+"env_demo_qa": "npx cypress run --env username=$APP_USERNAME,password=$PASSWORD,url='https://www.letskodeit.com' --spec cypress/e2e/advanced/environment_variables_demo.cy.js --headed --browser chrome"
+
+
+Terminal:
+APP_USERNAME="test@email.com" PASSWORD="abcabc" npm run env_demo_proccess
+
+
+
+
+******** API Syntax ********
+
+import { util } from "../../support/utilities"
+
+describe('API Testing Demo', () => {
+
+    let apiURL = Cypress.env('apiURL');
+    let accessToken = Cypress.env('accessToken');
+    let userId;
+    let gd;
+    
+    before('This is before Hook', () => {
+      cy.fixture('users_data').then((data) => {
+        gd = data;
+      })
+    })
+
+    before('Post Request - Before Hook', () => {
+      const userEmail = util.randomEmail()
+      const reqBody = {
+        name: gd.tid1.name,
+        gender: gd.tid1.gender, 
+        email: userEmail,
+        status: gd.tid1.status
+      }
+
+      cy.request({
+        method: 'POST',
+        url: apiURL,
+        headers: {
+          'authorization': accessToken
+        },
+        body: reqBody
+      })
+        .then((res) => {
+            expect(res.status).to.eq(201);
+            userId = res.body.id;
+        })
+    })
+
+    it('should validate put request', () => {
+      const userEmail = util.randomEmail()
+      const putReqBody = {
+        name: gd.tid2.name,
+        gender: gd.tid2.gender, 
+        email: userEmail,
+        status: gd.tid2.status
+      }
+
+      cy.request({
+        method: 'PUT',
+        url: apiURL + '/' + userId,
+        headers: {
+          'authorization': accessToken
+        },
+        body: putReqBody
+      })
+      .then((res) => {
+          expect(res.body.name).equal(putReqBody.name);
+          expect(res.body.gender).equal(putReqBody.gender);
+          expect(res.body.email).equal(putReqBody.email);
+          expect(res.body.status).equal(putReqBody.status);
+      })
+    })
+
+    it('should validate delete request', () => {
+      cy.request({
+        method: 'DELETE',
+        url: apiURL + '/' + userId,
+        headers: {
+          'authorization': accessToken
+        }
+      })
+      .then((res) => {
+          expect(res.status).equal(204);
+      })
+    })
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
